@@ -69,8 +69,20 @@ def main(args):
         cudnn.benchmark = True
 
     kwargs = {'num_workers': 0, 'pin_memory': True} if use_cuda else {}
-    trainset = DCCPT_data(root=datadir, train=True, h5=args.h5)
-    testset = DCCPT_data(root=datadir, train=False, h5=args.h5)
+    if args.db == 'cifar10' or args.db == 'ccifar10':
+        import torchvision
+        import torchvision.transforms as transforms
+
+        transform = transforms.Compose(
+        [transforms.ToTensor(),
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        trainset = torchvision.datasets.CIFAR10(root=datadir, train=True,
+                                        download=True, transform=transform)
+        testset = torchvision.datasets.CIFAR10(root=datadir, train=False,
+                                       download=True, transform=transform)
+    else:
+        trainset = DCCPT_data(root=datadir, train=True, h5=args.h5)
+        testset = DCCPT_data(root=datadir, train=False, h5=args.h5)
 
     nepoch = int(np.ceil(np.array(args.niter * args.batchsize, dtype=float) / len(trainset)))
     step = int(np.ceil(np.array(args.step * args.batchsize, dtype=float) / len(trainset)))
