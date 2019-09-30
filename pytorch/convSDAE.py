@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
+import pdb
 
 # The model definition for training convolutional Stacked Denoising AE.
 # This model is used during the pretraining stage.
@@ -93,6 +94,9 @@ class convSDAE(nn.Module):
                 if index:
                     out = bdecoder(out)
                     out = F.leaky_relu(out, negative_slope=self.reluslope)
-        out = self.loss(out, inp)
+        try:
+            out = self.loss(out, inp)
+        except:
+            pdb.set_trace()
         return out
 
